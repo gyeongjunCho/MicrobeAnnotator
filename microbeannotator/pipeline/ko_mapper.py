@@ -117,9 +117,6 @@ def module_information_importer(input_files):
     # Create module matrix
     metabolism_matrix = pd.DataFrame(0, index=module_ids, columns=genome_names)
     print("Finished")
-    # Save the dataframes to csv files
-    module_group_matrix.to_csv(data_folder / 'metabolic_summary__barplot_data.csv')
-    metabolism_matrix.to_csv(data_folder / 'metabolic_summary__heatmap_data.csv')
     return regular_modules, bifurcation_modules, structural_modules, \
            module_information, metabolism_matrix, module_group_matrix
 
@@ -481,6 +478,10 @@ def plot_function_barplots(module_colors, module_group_matrix, metabolism_matrix
         for genome in list(metabolism_matrix_dropped_relabel.columns):
             if metabolism_matrix_dropped_relabel.loc[module,genome] >= 80:
                 module_group_matrix.loc[module_colors[module][0],genome] += 1
+
+    # Save module_group_matrix to a CSV file with prefix
+    module_group_matrix.to_csv(f'{prefix}_module_group_matrix.tab',, sep="\t")
+
     module_group_matrix_transp = module_group_matrix.T
     emptyness = (module_group_matrix_transp == 0).all()
     if emptyness.all() == True:
@@ -505,6 +506,7 @@ def plot_function_barplots(module_colors, module_group_matrix, metabolism_matrix
         Figure.subplots_adjust()
         Figure.savefig(prefix + "_barplot.pdf", bbox_inches="tight")
     print("Finished")
+
 
 def create_output_files(metabolic_annotation, metabolism_matrix, module_information, cluster, prefix):
     matplotlib.rcParams['pdf.fonttype'] = 42
@@ -550,9 +552,11 @@ def create_output_files(metabolic_annotation, metabolism_matrix, module_informat
     # Save original annotation table but add module names and pathway
     module_names = []
     module_pathways = []
+    module_pathwaysgroup = []  # New list for pathway group information (by Gyeongjun Cho)
     for module in metabolism_matrix.index:
         module_names.append(module_information[module][0])
         module_pathways.append(module_information[module][1])
+        module_pathwaysgroup.append(module_information[module][2]) # pathwaygroups
     metabolism_matrix.insert(loc=0, column="name", value=module_names)
     metabolism_matrix.insert(loc=1, column="pathway group", value=module_pathways)
     metabolism_matrix.index.name = 'module'
