@@ -117,6 +117,9 @@ def module_information_importer(input_files):
     # Create module matrix
     metabolism_matrix = pd.DataFrame(0, index=module_ids, columns=genome_names)
     print("Finished")
+    # Save the dataframes to csv files
+    module_group_matrix.to_csv(data_folder / 'metabolic_summary__barplot_data.csv')
+    metabolism_matrix.to_csv(data_folder / 'metabolic_summary__heatmap_data.csv')
     return regular_modules, bifurcation_modules, structural_modules, \
            module_information, metabolism_matrix, module_group_matrix
 
